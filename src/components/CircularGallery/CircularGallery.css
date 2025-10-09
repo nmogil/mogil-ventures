@@ -3,8 +3,26 @@
   height: 100%;
   overflow: hidden;
   cursor: grab;
+  touch-action: pan-y pinch-zoom; /* Allow vertical scroll but prevent default horizontal */
 }
 
 .circular-gallery:active {
   cursor: grabbing;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .circular-gallery {
+    cursor: default; /* Remove cursor on mobile */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .circular-gallery * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,7 +1,6 @@
 #root {
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -39,4 +38,17 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* App-specific mobile optimizations */
+.app {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure smooth scrolling on all sections */
+section {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
 }

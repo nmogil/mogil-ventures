@@ -173,7 +173,7 @@ const FuzzyText: React.FC<FuzzyTextProps> = ({
     };
   }, [children, fontSize, fontWeight, fontFamily, color, enableHover, baseIntensity, hoverIntensity]);
 
-  return <canvas ref={canvasRef} />;
+  return <canvas ref={canvasRef} className="fuzzy-text-canvas" />;
 };
 
 export default FuzzyText;

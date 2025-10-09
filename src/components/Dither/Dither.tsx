@@ -312,22 +312,37 @@ export default function Dither({
   enableMouseInteraction = true,
   mouseRadius = 1
 }: DitherProps) {
+  // Detect mobile and adjust performance settings
+  const isMobile = typeof window !== 'undefined' && (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    window.innerWidth < 768
+  );
+
+  // Reduce quality on mobile for better performance
+  const mobilePixelSize = Math.max(pixelSize * 1.5, 3); // Larger pixels = less processing
+  const mobileColorNum = Math.max(colorNum - 1, 2); // Fewer colors = less processing
+
   return (
     <Canvas
       className="dither-container"
       camera={{ position: [0, 0, 6] }}
       dpr={1}
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
+      gl={{
+        antialias: !isMobile, // Disable antialiasing on mobile
+        preserveDrawingBuffer: true,
+        powerPreference: isMobile ? 'low-power' : 'high-performance'
+      }}
+      frameloop={isMobile ? 'demand' : 'always'} // Reduce frame updates on mobile
     >
       <DitheredWaves
         waveSpeed={waveSpeed}
         waveFrequency={waveFrequency}
         waveAmplitude={waveAmplitude}
         waveColor={waveColor}
-        colorNum={colorNum}
-        pixelSize={pixelSize}
+        colorNum={isMobile ? mobileColorNum : colorNum}
+        pixelSize={isMobile ? mobilePixelSize : pixelSize}
         disableAnimation={disableAnimation}
-        enableMouseInteraction={enableMouseInteraction}
+        enableMouseInteraction={!isMobile && enableMouseInteraction} // Disable mouse interaction on mobile
         mouseRadius={mouseRadius}
       />
     </Canvas>

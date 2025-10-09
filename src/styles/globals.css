@@ -30,6 +30,53 @@
 
 html {
   scroll-behavior: smooth;
+  /* Prevent horizontal overflow */
+  overflow-x: hidden;
+}
+
+body {
+  /* Prevent horizontal overflow */
+  overflow-x: hidden;
+  /* Support for notched devices */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  html {
+    /* Better font rendering on mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+  }
+
+  /* Optimize touch targets */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improve tap responsiveness */
+  * {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Ensure all interactive elements are accessible on touch */
+@layer utilities {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -37,5 +84,39 @@ html {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Support for landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  html,
+  body {
+    height: 100vh;
+    height: 100dvh; /* Use dynamic viewport height on supporting browsers */
+  }
+}
+
+/* FuzzyText responsive sizing */
+.fuzzy-text-canvas {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Mobile: constrain canvas to viewport width */
+@media (max-width: 768px) {
+  .fuzzy-text-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Desktop: allow canvas to be full size */
+@media (min-width: 769px) {
+  .fuzzy-text-canvas {
+    max-width: none;
   }
 }
