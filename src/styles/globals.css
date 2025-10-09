@@ -8,6 +8,7 @@
     --foreground: 0 0% 100%;
     --card: 0 0% 5%;
     --card-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
     --radius: 0.5rem;
   }
 
