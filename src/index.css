@@ -54,6 +54,19 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+@keyframes smooth-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-smooth-float {
+  animation: smooth-float 2s ease-in-out infinite;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
