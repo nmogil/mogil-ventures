@@ -2,11 +2,15 @@ import { useState, useEffect } from 'react'
 import Dither from './components/Dither'
 import FuzzyText from './components/FuzzyText'
 import CircularGallery from './components/CircularGallery'
+import ProfileCard from './components/ProfileCard'
 import { portfolioItems } from './data/portfolioItems'
+import { profileData } from './data/profileData'
+import { Dialog, DialogContent } from './components/ui/dialog'
 
 function App() {
   const [showGallery, setShowGallery] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [showProfileCard, setShowProfileCard] = useState(false)
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
@@ -35,6 +39,10 @@ function App() {
       setShowGallery(false)
       setIsTransitioning(false)
     }, 800)
+  }
+
+  const handleContact = () => {
+    window.location.href = `mailto:${profileData.contactEmail}`
   }
 
   return (
@@ -178,6 +186,48 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* ProfileCard Dialog (for testing) */}
+      <Dialog open={showProfileCard} onOpenChange={setShowProfileCard}>
+        <DialogContent className="max-w-fit p-0 border-0 bg-transparent" hideCloseButton>
+          <ProfileCard
+            {...profileData}
+            onContactClick={handleContact}
+            enableTilt={true}
+            enableMobileTilt={false}
+            showUserInfo={true}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Optional: Button to open ProfileCard for testing */}
+      <button
+        onClick={() => setShowProfileCard(true)}
+        style={{
+          position: 'fixed',
+          bottom: '2rem',
+          right: '2rem',
+          padding: '12px 24px',
+          background: 'rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '8px',
+          color: 'white',
+          cursor: 'pointer',
+          backdropFilter: 'blur(10px)',
+          zIndex: 100,
+          fontSize: '14px',
+          fontWeight: 500,
+          transition: 'all 0.3s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+        }}
+      >
+        View Profile Card
+      </button>
     </div>
   )
 }
