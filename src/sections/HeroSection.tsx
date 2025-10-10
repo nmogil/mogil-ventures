@@ -1,7 +1,20 @@
+import { useState, useEffect } from 'react';
 import FuzzyText from '@/components/FuzzyText';
 import Dither from '@/components/Dither';
 
 export default function HeroSection() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <section className="relative w-full h-screen overflow-hidden">
       {/* Background */}
@@ -21,16 +34,18 @@ export default function HeroSection() {
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center w-full h-full px-6 sm:px-8 md:px-12 pointer-events-none">
         <div className="w-full md:w-auto flex justify-center items-center overflow-hidden md:overflow-visible pointer-events-auto">
-          <FuzzyText
-            baseIntensity={0.2}
-            hoverIntensity={0.5}
-            enableHover={true}
-            fontSize="clamp(3rem, 12vw, 8rem)"
-            fontWeight={900}
-            color="#fff"
-          >
-            MOGIL VENTURES
-          </FuzzyText>
+          <div style={isMobile ? { filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(0,0,0,0.6))' } : {}}>
+            <FuzzyText
+              baseIntensity={isMobile ? 0.05 : 0.2}
+              hoverIntensity={isMobile ? 0.15 : 0.5}
+              enableHover={true}
+              fontSize={isMobile ? "clamp(2.5rem, 15vw, 8rem)" : "clamp(3rem, 12vw, 8rem)"}
+              fontWeight={900}
+              color="#fff"
+            >
+              MOGIL VENTURES
+            </FuzzyText>
+          </div>
         </div>
       </div>
 
