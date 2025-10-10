@@ -25,7 +25,7 @@ export default function HeroSection() {
             baseIntensity={0.2}
             hoverIntensity={0.5}
             enableHover={true}
-            fontSize="clamp(2rem, 8vw, 8rem)"
+            fontSize="clamp(3rem, 12vw, 8rem)"
             fontWeight={900}
             color="#fff"
           >
