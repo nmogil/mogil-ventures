@@ -154,6 +154,7 @@ interface MediaProps {
   textColor: string;
   borderRadius?: number;
   font?: string;
+  url?: string;
 }
 
 class Media {
@@ -172,6 +173,7 @@ class Media {
   textColor: string;
   borderRadius: number;
   font?: string;
+  url?: string;
   program!: Program;
   plane!: Mesh;
   title!: Title;
@@ -198,7 +200,8 @@ class Media {
     bend,
     textColor,
     borderRadius = 0,
-    font
+    font,
+    url
   }: MediaProps) {
     this.geometry = geometry;
     this.gl = gl;
@@ -214,6 +217,7 @@ class Media {
     this.textColor = textColor;
     this.borderRadius = borderRadius;
     this.font = font;
+    this.url = url;
     this.createShader();
     this.createMesh();
     this.createTitle();
@@ -375,7 +379,7 @@ class Media {
 }
 
 interface AppConfig {
-  items?: { image: string; text: string }[];
+  items?: { image: string; text: string; url?: string }[];
   bend?: number;
   textColor?: string;
   borderRadius?: number;
@@ -401,7 +405,7 @@ class App {
   scene!: Transform;
   planeGeometry!: Plane;
   medias: Media[] = [];
-  mediasImages: { image: string; text: string }[] = [];
+  mediasImages: { image: string; text: string; url?: string }[] = [];
   screen!: { width: number; height: number };
   viewport!: { width: number; height: number };
   raf: number = 0;
@@ -414,6 +418,10 @@ class App {
 
   isDown: boolean = false;
   start: number = 0;
+  clickThreshold: number = 5;
+  hasMoved: boolean = false;
+  clickX: number = 0;
+  clickY: number = 0;
 
   constructor(
     container: HTMLElement,
@@ -480,7 +488,7 @@ class App {
   }
 
   createMedias(
-    items: { image: string; text: string }[] | undefined,
+    items: { image: string; text: string; url?: string }[] | undefined,
     bend: number = 1,
     textColor: string,
     borderRadius: number,
@@ -537,15 +545,23 @@ class App {
         bend,
         textColor,
         borderRadius,
-        font
+        font,
+        url: data.url
       });
     });
   }
 
   onTouchDown(e: MouseEvent | TouchEvent) {
     this.isDown = true;
+    this.hasMoved = false;
     this.scroll.position = this.scroll.current;
     this.start = 'touches' in e ? e.touches[0].clientX : e.clientX;
+
+    // Store click position for later hit detection
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    this.clickX = clientX;
+    this.clickY = clientY;
   }
 
   onTouchMove(e: MouseEvent | TouchEvent) {
@@ -553,11 +569,66 @@ class App {
     const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const distance = (this.start - x) * (this.scrollSpeed * 0.025);
     this.scroll.target = (this.scroll.position ?? 0) + distance;
+
+    // Track if user has moved significantly (for click detection)
+    if (Math.abs(this.start - x) > this.clickThreshold) {
+      this.hasMoved = true;
+    }
   }
 
   onTouchUp() {
     this.isDown = false;
+
+    // Handle click if user didn't drag
+    if (!this.hasMoved) {
+      this.handleClick();
+    }
+
     this.onCheck();
+  }
+
+  handleClick() {
+    if (!this.medias || !this.medias[0]) return;
+
+    // Convert click position to normalized device coordinates
+    const rect = this.container.getBoundingClientRect();
+    const x = ((this.clickX - rect.left) / this.screen.width) * 2 - 1;
+    const y = -((this.clickY - rect.top) / this.screen.height) * 2 + 1;
+
+    // Convert NDC to viewport coordinates
+    const viewportX = x * (this.viewport.width / 2);
+    const viewportY = y * (this.viewport.height / 2);
+
+    // Find which media item was clicked
+    let clickedMedia: Media | null = null;
+    let minDistance = Infinity;
+
+    for (const media of this.medias) {
+      const planeX = media.plane.position.x;
+      const planeY = media.plane.position.y;
+      const halfWidth = media.plane.scale.x / 2;
+      const halfHeight = media.plane.scale.y / 2;
+
+      // Check if click is within this plane's bounds
+      if (
+        viewportX >= planeX - halfWidth &&
+        viewportX <= planeX + halfWidth &&
+        viewportY >= planeY - halfHeight &&
+        viewportY <= planeY + halfHeight
+      ) {
+        // If multiple planes overlap, choose the one closest to center
+        const distance = Math.abs(planeX);
+        if (distance < minDistance) {
+          minDistance = distance;
+          clickedMedia = media;
+        }
+      }
+    }
+
+    // Open URL if a media item was clicked and it has a URL
+    if (clickedMedia && clickedMedia.url) {
+      window.open(clickedMedia.url, '_blank', 'noopener,noreferrer');
+    }
   }
 
   onWheel(e: Event) {
@@ -639,7 +710,7 @@ class App {
 }
 
 interface CircularGalleryProps {
-  items?: { image: string; text: string }[];
+  items?: { image: string; text: string; url?: string }[];
   bend?: number;
   textColor?: string;
   borderRadius?: number;

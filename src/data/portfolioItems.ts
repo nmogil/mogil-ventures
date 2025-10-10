@@ -1,31 +1,28 @@
 export interface PortfolioItem {
   image: string;
   text: string;
+  url?: string;
 }
 
 export const portfolioItems: PortfolioItem[] = [
   {
-    image: 'https://picsum.photos/seed/1/800/600?grayscale',
-    text: 'Company 1'
+    image: '/images/portfolio/gray-scale-black-and-white-with-the-words--prompty.png',
+    text: 'Prompty',
+    url: 'https://app.prompty.games/'
   },
   {
-    image: 'https://picsum.photos/seed/2/800/600?grayscale',
-    text: 'Company 2'
+    image: '/images/portfolio/gray-scale-black-and-white-with-the-words--paperbo.png',
+    text: 'Paper Boy',
+    url: 'https://www.paper-boy.app/'
   },
   {
-    image: 'https://picsum.photos/seed/3/800/600?grayscale',
-    text: 'Company 3'
+    image: '/images/portfolio/gray-scale-black-and-white-with-the-words--efficie.png',
+    text: 'Efficient',
+    url: 'https://withefficient.com/'
   },
   {
-    image: 'https://picsum.photos/seed/4/800/600?grayscale',
-    text: 'Company 4'
-  },
-  {
-    image: 'https://picsum.photos/seed/5/800/600?grayscale',
-    text: 'Company 5'
-  },
-  {
-    image: 'https://picsum.photos/seed/6/800/600?grayscale',
-    text: 'Company 6'
+    image: '/images/portfolio/gray-scale-black-and-white-with-the-words--ootd--w.png',
+    text: 'OOTD',
+    url: 'https://www.ootdfit.com/'
   }
 ];
