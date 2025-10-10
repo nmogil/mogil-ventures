@@ -19,8 +19,8 @@ export default function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex items-center justify-center w-full h-full px-6 sm:px-8 md:px-12">
-        <div className="w-full md:w-auto flex justify-center items-center overflow-hidden md:overflow-visible">
+      <div className="relative z-10 flex items-center justify-center w-full h-full px-6 sm:px-8 md:px-12 pointer-events-none">
+        <div className="w-full md:w-auto flex justify-center items-center overflow-hidden md:overflow-visible pointer-events-auto">
           <FuzzyText
             baseIntensity={0.2}
             hoverIntensity={0.5}
