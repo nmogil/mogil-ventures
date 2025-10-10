@@ -11,9 +11,21 @@ export default function HeroSection() {
     return false;
   });
 
+  // Calculate explicit font size for mobile to avoid Safari clamp() issues
+  const [mobileFontSize, setMobileFontSize] = useState<string>('');
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
+
+      // Calculate explicit font size for Safari mobile
+      if (window.innerWidth < 768) {
+        const vwSize = window.innerWidth * 0.25; // 25vw
+        const minSize = 72; // 4.5rem
+        const maxSize = 128; // 8rem
+        const calculatedSize = Math.max(minSize, Math.min(vwSize, maxSize));
+        setMobileFontSize(`${calculatedSize}px`);
+      }
     };
 
     checkMobile();
@@ -42,10 +54,10 @@ export default function HeroSection() {
         <div className="w-full md:w-auto flex justify-center items-center overflow-hidden md:overflow-visible pointer-events-auto">
           <div style={isMobile ? { filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(0,0,0,0.6))' } : {}}>
             <FuzzyText
-              baseIntensity={isMobile ? 0.05 : 0.2}
-              hoverIntensity={isMobile ? 0.15 : 0.5}
+              baseIntensity={0.2}
+              hoverIntensity={0.5}
               enableHover={true}
-              fontSize={isMobile ? "clamp(4.5rem, 25vw, 8rem)" : "clamp(3rem, 12vw, 8rem)"}
+              fontSize={isMobile && mobileFontSize ? mobileFontSize : (isMobile ? "clamp(4.5rem, 25vw, 8rem)" : "clamp(3rem, 12vw, 8rem)")}
               fontWeight={900}
               color="#fff"
             >

@@ -104,13 +104,16 @@ body {
 .fuzzy-text-canvas {
   display: block;
   margin: 0 auto;
+  /* Prevent Safari from applying text size adjustments to canvas */
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
 }
 
-/* Mobile: constrain canvas to viewport width */
+/* Mobile: allow canvas to display at full calculated size */
 @media (max-width: 768px) {
   .fuzzy-text-canvas {
     max-width: 100%;
-    height: auto;
+    /* Don't use height: auto - it causes Safari to scale down the canvas */
   }
 }
 
