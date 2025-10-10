@@ -367,7 +367,12 @@ class Media {
         this.plane.program.uniforms.uViewportSizes.value = [this.viewport.width, this.viewport.height];
       }
     }
-    this.scale = this.screen.height / 1500;
+
+    // Increase item size on mobile (1.6x larger)
+    const isMobile = window.innerWidth < 768;
+    const mobileScaleMultiplier = isMobile ? 1.6 : 1;
+
+    this.scale = (this.screen.height / 1500) * mobileScaleMultiplier;
     this.plane.scale.y = (this.viewport.height * (900 * this.scale)) / this.screen.height;
     this.plane.scale.x = (this.viewport.width * (700 * this.scale)) / this.screen.width;
     this.plane.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y];
@@ -423,6 +428,12 @@ class App {
   clickX: number = 0;
   clickY: number = 0;
 
+  // Mobile improvements
+  isMobile: boolean = false;
+  velocity: number = 0;
+  lastTouchX: number = 0;
+  lastTouchTime: number = 0;
+
   constructor(
     container: HTMLElement,
     {
@@ -440,6 +451,10 @@ class App {
     this.scrollSpeed = scrollSpeed;
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
     this.onCheckDebounce = debounce(this.onCheck.bind(this), 200);
+
+    // Detect mobile for improved touch handling
+    this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                    window.innerWidth < 768;
     this.createRenderer();
     this.createCamera();
     this.createScene();
@@ -562,13 +577,30 @@ class App {
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     this.clickX = clientX;
     this.clickY = clientY;
+
+    // Initialize velocity tracking for momentum
+    this.velocity = 0;
+    this.lastTouchX = clientX;
+    this.lastTouchTime = Date.now();
   }
 
   onTouchMove(e: MouseEvent | TouchEvent) {
     if (!this.isDown) return;
     const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const distance = (this.start - x) * (this.scrollSpeed * 0.025);
+
+    // Increase touch sensitivity on mobile (2x more sensitive)
+    const touchMultiplier = this.isMobile ? 0.05 : 0.025;
+    const distance = (this.start - x) * (this.scrollSpeed * touchMultiplier);
     this.scroll.target = (this.scroll.position ?? 0) + distance;
+
+    // Calculate velocity for momentum scrolling
+    const now = Date.now();
+    const timeDelta = now - this.lastTouchTime;
+    if (timeDelta > 0) {
+      this.velocity = (this.lastTouchX - x) / timeDelta;
+      this.lastTouchX = x;
+      this.lastTouchTime = now;
+    }
 
     // Track if user has moved significantly (for click detection)
     if (Math.abs(this.start - x) > this.clickThreshold) {
@@ -582,6 +614,11 @@ class App {
     // Handle click if user didn't drag
     if (!this.hasMoved) {
       this.handleClick();
+      this.velocity = 0; // Reset velocity on click
+    } else {
+      // Apply momentum based on swipe velocity
+      const momentumMultiplier = this.isMobile ? 15 : 10;
+      this.scroll.target += this.velocity * momentumMultiplier;
     }
 
     this.onCheck();
@@ -665,6 +702,14 @@ class App {
   }
 
   update() {
+    // Apply momentum decay (friction) when not touching
+    if (!this.isDown && Math.abs(this.velocity) > 0.001) {
+      const friction = 0.92; // Friction coefficient (lower = more friction)
+      this.velocity *= friction;
+      const momentumMultiplier = this.isMobile ? 15 : 10;
+      this.scroll.target += this.velocity * momentumMultiplier;
+    }
+
     this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease);
     const direction = this.scroll.current > this.scroll.last ? 'right' : 'left';
     if (this.medias) {
