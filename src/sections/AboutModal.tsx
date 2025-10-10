@@ -9,11 +9,7 @@ interface AboutModalProps {
 
 export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
   const handleContact = () => {
-    // Option 1: Email
-    window.location.href = `mailto:${profileData.contactEmail}`;
-
-    // Option 2: Calendar (uncomment and update URL)
-    // window.open('https://calendly.com/mogilventures', '_blank');
+    window.open('https://www.noahmogil.com/contact', '_blank');
   };
 
   return (
@@ -21,6 +17,9 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
       <DialogContent
         className="max-w-fit p-0 border-0 bg-transparent max-sm:flex max-sm:items-center max-sm:justify-center max-sm:p-4 max-sm:bg-black/95"
         hideCloseButton={true}
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
       >
         {/* Mobile-only close button */}
         <button

@@ -273,7 +273,8 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
     [iconUrl, grainUrl, showBehindGradient, behindGradient, innerGradient]
   );
 
-  const handleContactClick = useCallback(() => {
+  const handleContactClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
     onContactClick?.();
   }, [onContactClick]);
 
