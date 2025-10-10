@@ -616,8 +616,8 @@ class App {
       this.handleClick();
       this.velocity = 0; // Reset velocity on click
     } else {
-      // Apply momentum based on swipe velocity
-      const momentumMultiplier = this.isMobile ? 15 : 10;
+      // Apply momentum based on swipe velocity (reduced for slower momentum)
+      const momentumMultiplier = this.isMobile ? 8 : 10;
       this.scroll.target += this.velocity * momentumMultiplier;
     }
 
@@ -704,9 +704,9 @@ class App {
   update() {
     // Apply momentum decay (friction) when not touching
     if (!this.isDown && Math.abs(this.velocity) > 0.001) {
-      const friction = 0.92; // Friction coefficient (lower = more friction)
+      const friction = 0.88; // Friction coefficient (lower = more friction, increased for slower momentum)
       this.velocity *= friction;
-      const momentumMultiplier = this.isMobile ? 15 : 10;
+      const momentumMultiplier = this.isMobile ? 8 : 10;
       this.scroll.target += this.velocity * momentumMultiplier;
     }
 

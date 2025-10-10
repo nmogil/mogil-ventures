@@ -39,7 +39,7 @@ export default function HeroSection() {
               baseIntensity={isMobile ? 0.05 : 0.2}
               hoverIntensity={isMobile ? 0.15 : 0.5}
               enableHover={true}
-              fontSize={isMobile ? "clamp(3.5rem, 20vw, 8rem)" : "clamp(3rem, 12vw, 8rem)"}
+              fontSize={isMobile ? "clamp(4.5rem, 25vw, 8rem)" : "clamp(3rem, 12vw, 8rem)"}
               fontWeight={900}
               color="#fff"
             >
