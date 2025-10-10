@@ -3,7 +3,13 @@ import FuzzyText from '@/components/FuzzyText';
 import Dither from '@/components/Dither';
 
 export default function HeroSection() {
-  const [isMobile, setIsMobile] = useState(false);
+  // Initialize with proper mobile detection to avoid flash of wrong size
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
 
   useEffect(() => {
     const checkMobile = () => {
