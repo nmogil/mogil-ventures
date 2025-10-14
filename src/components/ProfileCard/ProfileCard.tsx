@@ -297,26 +297,6 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
             />
             {showUserInfo && (
               <div className="pc-user-info">
-                <div className="pc-user-details">
-                  <div className="pc-mini-avatar">
-                    <img
-                      src={miniAvatarUrl || avatarUrl}
-                      alt={`${name || 'User'} mini avatar`}
-                      loading="lazy"
-                      onError={e => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.opacity = '0.5';
-                        target.src = avatarUrl;
-                      }}
-                    />
-                  </div>
-                  <div className="pc-user-text">
-                    <div className="pc-handle">
-                      <span>@{handle}</span>
-                    </div>
-                    <div className="pc-status">{status}</div>
-                  </div>
-                </div>
                 <button
                   className="pc-contact-btn"
                   onClick={handleContactClick}
