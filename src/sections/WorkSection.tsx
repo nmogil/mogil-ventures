@@ -3,11 +3,7 @@ import { portfolioItems } from '@/data/portfolioItems';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '@/lib/motion';
 
-interface WorkSectionProps {
-  onAboutClick: () => void;
-}
-
-export default function WorkSection({ onAboutClick }: WorkSectionProps) {
+export default function WorkSection() {
   return (
     <section className="relative min-h-screen bg-black py-8 sm:py-12 md:py-16 px-4">
       {/* Contact Button */}

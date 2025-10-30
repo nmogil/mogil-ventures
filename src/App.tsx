@@ -12,7 +12,7 @@ function App() {
     <div className="app">
       <HeroSection />
       <WhatWeDoSection />
-      <WorkSection onAboutClick={() => setIsAboutOpen(true)} />
+      <WorkSection />
       <Footer />
       <AboutModal
         isOpen={isAboutOpen}
