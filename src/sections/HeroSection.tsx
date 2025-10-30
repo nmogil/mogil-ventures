@@ -52,12 +52,12 @@ export default function HeroSection() {
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center w-full h-full px-6 sm:px-8 md:px-12 pointer-events-none">
         <div className="w-full md:w-auto flex justify-center items-center overflow-hidden md:overflow-visible pointer-events-auto">
-          <div style={isMobile ? { filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(0,0,0,0.6))' } : {}}>
+          <div style={isMobile ? { filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.3)) drop-shadow(0 0 30px rgba(255,255,255,0.2)) drop-shadow(0 0 10px rgba(0,0,0,0.8))' } : { filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.2))' }}>
             <FuzzyText
-              baseIntensity={0.2}
-              hoverIntensity={0.5}
+              baseIntensity={0.3}
+              hoverIntensity={0.6}
               enableHover={true}
-              fontSize={isMobile && mobileFontSize ? mobileFontSize : (isMobile ? "clamp(4.5rem, 25vw, 8rem)" : "clamp(3rem, 12vw, 8rem)")}
+              fontSize={isMobile && mobileFontSize ? mobileFontSize : (isMobile ? "clamp(4.5rem, 25vw, 8rem)" : "clamp(3.5rem, 13vw, 9rem)")}
               fontWeight={900}
               color="#fff"
             >

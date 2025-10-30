@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import HeroSection from './sections/HeroSection';
+import WhatWeDoSection from './sections/WhatWeDoSection';
 import WorkSection from './sections/WorkSection';
+import Footer from './sections/Footer';
 import AboutModal from './sections/AboutModal';
 
 function App() {
@@ -9,7 +11,9 @@ function App() {
   return (
     <div className="app">
       <HeroSection />
+      <WhatWeDoSection />
       <WorkSection onAboutClick={() => setIsAboutOpen(true)} />
+      <Footer />
       <AboutModal
         isOpen={isAboutOpen}
         onClose={() => setIsAboutOpen(false)}
