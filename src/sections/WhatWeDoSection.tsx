@@ -1,7 +1,15 @@
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, hoverCard } from "@/lib/motion";
+import { getCalApi } from "@calcom/embed-react";
+import { useEffect } from "react";
 
 export default function WhatWeDoSection() {
+  useEffect(() => {
+    (async function () {
+      const cal = await getCalApi({ namespace: "intro" });
+      cal("ui", { hideEventTypeDetails: false, layout: "month_view" });
+    })();
+  }, []);
   return (
     <section
       className="
@@ -214,10 +222,9 @@ export default function WhatWeDoSection() {
               focus:outline-none focus:ring-2 focus:ring-white/40
               transition-all duration-300 touch-manipulation
             "
-            onClick={() => {
-              // TODO: Update with your Calendly or contact link
-              window.open('https://www.mogilventures.com/contact', '_blank');
-            }}
+            data-cal-namespace="intro"
+            data-cal-link="mogil-ventures/intro"
+            data-cal-config='{"layout":"month_view"}'
           >
             Book a discovery call
           </motion.button>
