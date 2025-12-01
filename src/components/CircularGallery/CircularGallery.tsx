@@ -17,118 +17,6 @@ function lerp(p1: number, p2: number, t: number): number {
   return p1 + (p2 - p1) * t;
 }
 
-function autoBind(instance: any): void {
-  const proto = Object.getPrototypeOf(instance);
-  Object.getOwnPropertyNames(proto).forEach(key => {
-    if (key !== 'constructor' && typeof instance[key] === 'function') {
-      instance[key] = instance[key].bind(instance);
-    }
-  });
-}
-
-function getFontSize(font: string): number {
-  const match = font.match(/(\d+)px/);
-  return match ? parseInt(match[1], 10) : 30;
-}
-
-function createTextTexture(
-  gl: GL,
-  text: string,
-  font: string = 'bold 30px monospace',
-  color: string = 'black'
-): { texture: Texture; width: number; height: number } {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  if (!context) throw new Error('Could not get 2d context');
-
-  context.font = font;
-  const metrics = context.measureText(text);
-  const textWidth = Math.ceil(metrics.width);
-  const fontSize = getFontSize(font);
-  const textHeight = Math.ceil(fontSize * 1.2);
-
-  canvas.width = textWidth + 20;
-  canvas.height = textHeight + 20;
-
-  context.font = font;
-  context.fillStyle = color;
-  context.textBaseline = 'middle';
-  context.textAlign = 'center';
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillText(text, canvas.width / 2, canvas.height / 2);
-
-  const texture = new Texture(gl, { generateMipmaps: false });
-  texture.image = canvas;
-  return { texture, width: canvas.width, height: canvas.height };
-}
-
-interface TitleProps {
-  gl: GL;
-  plane: Mesh;
-  renderer: Renderer;
-  text: string;
-  textColor?: string;
-  font?: string;
-}
-
-class Title {
-  gl: GL;
-  plane: Mesh;
-  renderer: Renderer;
-  text: string;
-  textColor: string;
-  font: string;
-  mesh!: Mesh;
-
-  constructor({ gl, plane, renderer, text, textColor = '#545050', font = '30px sans-serif' }: TitleProps) {
-    autoBind(this);
-    this.gl = gl;
-    this.plane = plane;
-    this.renderer = renderer;
-    this.text = text;
-    this.textColor = textColor;
-    this.font = font;
-    this.createMesh();
-  }
-
-  createMesh() {
-    const { texture, width, height } = createTextTexture(this.gl, this.text, this.font, this.textColor);
-    const geometry = new Plane(this.gl);
-    const program = new Program(this.gl, {
-      vertex: `
-        attribute vec3 position;
-        attribute vec2 uv;
-        uniform mat4 modelViewMatrix;
-        uniform mat4 projectionMatrix;
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragment: `
-        precision highp float;
-        uniform sampler2D tMap;
-        varying vec2 vUv;
-        void main() {
-          vec4 color = texture2D(tMap, vUv);
-          if (color.a < 0.1) discard;
-          gl_FragColor = color;
-        }
-      `,
-      uniforms: { tMap: { value: texture } },
-      transparent: true
-    });
-    this.mesh = new Mesh(this.gl, { geometry, program });
-    const aspect = width / height;
-    const textHeightScaled = this.plane.scale.y * 0.15;
-    const textWidthScaled = textHeightScaled * aspect;
-    this.mesh.scale.set(textWidthScaled, textHeightScaled, 1);
-    this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeightScaled * 0.5 - 0.05;
-    this.mesh.setParent(this.plane);
-  }
-}
-
 interface ScreenSize {
   width: number;
   height: number;
@@ -151,9 +39,7 @@ interface MediaProps {
   text: string;
   viewport: Viewport;
   bend: number;
-  textColor: string;
   borderRadius?: number;
-  font?: string;
   url?: string;
 }
 
@@ -170,13 +56,10 @@ class Media {
   text: string;
   viewport: Viewport;
   bend: number;
-  textColor: string;
   borderRadius: number;
-  font?: string;
   url?: string;
   program!: Program;
   plane!: Mesh;
-  title!: Title;
   scale!: number;
   padding!: number;
   width!: number;
@@ -198,9 +81,7 @@ class Media {
     text,
     viewport,
     bend,
-    textColor,
     borderRadius = 0,
-    font,
     url
   }: MediaProps) {
     this.geometry = geometry;
@@ -214,13 +95,10 @@ class Media {
     this.text = text;
     this.viewport = viewport;
     this.bend = bend;
-    this.textColor = textColor;
     this.borderRadius = borderRadius;
-    this.font = font;
     this.url = url;
     this.createShader();
     this.createMesh();
-    this.createTitle();
     this.onResize();
   }
 
@@ -306,17 +184,6 @@ class Media {
     this.plane.setParent(this.scene);
   }
 
-  createTitle() {
-    this.title = new Title({
-      gl: this.gl,
-      plane: this.plane,
-      renderer: this.renderer,
-      text: this.text,
-      textColor: this.textColor,
-      font: this.font
-    });
-  }
-
   update(scroll: { current: number; last: number }, direction: 'right' | 'left') {
     this.plane.position.x = this.x - scroll.current - this.extra;
 
@@ -368,9 +235,9 @@ class Media {
       }
     }
 
-    // Increase item size on mobile (1.6x larger)
+    // Increase item size on mobile (slightly larger but not too much to avoid overlap)
     const isMobile = window.innerWidth < 768;
-    const mobileScaleMultiplier = isMobile ? 1.6 : 1;
+    const mobileScaleMultiplier = isMobile ? 1.25 : 1;
 
     this.scale = (this.screen.height / 1500) * mobileScaleMultiplier;
     this.plane.scale.y = (this.viewport.height * (900 * this.scale)) / this.screen.height;
@@ -386,9 +253,7 @@ class Media {
 interface AppConfig {
   items?: { image: string; text: string; url?: string }[];
   bend?: number;
-  textColor?: string;
   borderRadius?: number;
-  font?: string;
   scrollSpeed?: number;
   scrollEase?: number;
 }
@@ -439,9 +304,7 @@ class App {
     {
       items,
       bend = 1,
-      textColor = '#ffffff',
       borderRadius = 0,
-      font = 'bold 30px Figtree',
       scrollSpeed = 2,
       scrollEase = 0.05
     }: AppConfig
@@ -460,7 +323,7 @@ class App {
     this.createScene();
     this.onResize();
     this.createGeometry();
-    this.createMedias(items, bend, textColor, borderRadius, font);
+    this.createMedias(items, bend, borderRadius);
     this.update();
     this.addEventListeners();
   }
@@ -505,9 +368,7 @@ class App {
   createMedias(
     items: { image: string; text: string; url?: string }[] | undefined,
     bend: number = 1,
-    textColor: string,
-    borderRadius: number,
-    font: string
+    borderRadius: number
   ) {
     const defaultItems = [
       {
@@ -558,9 +419,7 @@ class App {
         text: data.text,
         viewport: this.viewport,
         bend,
-        textColor,
         borderRadius,
-        font,
         url: data.url
       });
     });
@@ -757,9 +616,7 @@ class App {
 interface CircularGalleryProps {
   items?: { image: string; text: string; url?: string }[];
   bend?: number;
-  textColor?: string;
   borderRadius?: number;
-  font?: string;
   scrollSpeed?: number;
   scrollEase?: number;
 }
@@ -767,27 +624,26 @@ interface CircularGalleryProps {
 export default function CircularGallery({
   items,
   bend = 3,
-  textColor = '#ffffff',
   borderRadius = 0.05,
-  font = 'bold 30px Figtree',
   scrollSpeed = 2,
   scrollEase = 0.05
 }: CircularGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!containerRef.current) return;
+    // Skip initialization if container has no dimensions (e.g. hidden)
+    if (containerRef.current.clientWidth === 0 || containerRef.current.clientHeight === 0) return;
+
     const app = new App(containerRef.current, {
       items,
       bend,
-      textColor,
       borderRadius,
-      font,
       scrollSpeed,
       scrollEase
     });
     return () => {
       app.destroy();
     };
-  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
+  }, [items, bend, borderRadius, scrollSpeed, scrollEase]);
   return <div className="circular-gallery" ref={containerRef} />;
 }

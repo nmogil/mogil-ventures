@@ -1,24 +1,21 @@
-import { useState } from 'react';
-import HeroSection from './sections/HeroSection';
-import WhatWeDoSection from './sections/WhatWeDoSection';
-import WorkSection from './sections/WorkSection';
-import Footer from './sections/Footer';
-import AboutModal from './sections/AboutModal';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import BlogPost from './pages/BlogPost';
+import ThoughtsPage from './pages/ThoughtsPage';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
-  const [isAboutOpen, setIsAboutOpen] = useState(false);
-
   return (
-    <div className="app">
-      <HeroSection />
-      <WhatWeDoSection />
-      <WorkSection />
-      <Footer />
-      <AboutModal
-        isOpen={isAboutOpen}
-        onClose={() => setIsAboutOpen(false)}
-      />
-    </div>
+    <Router>
+      <ScrollToTop />
+      <div className="app min-h-screen bg-background text-foreground">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/thoughts" element={<ThoughtsPage />} />
+          <Route path="/thoughts/:slug" element={<BlogPost />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

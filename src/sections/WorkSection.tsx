@@ -2,21 +2,28 @@ import CircularGallery from '@/components/CircularGallery';
 import { portfolioItems } from '@/data/portfolioItems';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '@/lib/motion';
+import { useEffect, useState } from 'react';
 
 export default function WorkSection() {
-  return (
-    <section className="relative min-h-screen bg-black py-8 sm:py-12 md:py-16 px-4">
-      {/* Contact Button */}
-      {/* <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 z-10">
-        <button
-          onClick={onAboutClick}
-          className="min-h-[44px] min-w-[44px] px-4 py-2 sm:px-6 sm:py-3 border border-white/20 bg-black/50 backdrop-blur-md rounded-full text-white text-sm sm:text-base hover:bg-white/10 hover:border-white/40 transition-all duration-300 touch-manipulation"
-          aria-label="Contact us"
-        >
-          Contact
-        </button>
-      </div> */}
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return (
+    <section className="relative bg-black py-8 sm:py-12 md:py-16 px-4">
       {/* Header */}
       <motion.div
         className="max-w-3xl mx-auto text-center mb-8 sm:mb-12 md:mb-16"
@@ -47,16 +54,14 @@ export default function WorkSection() {
         </motion.p>
       </motion.div>
 
-      {/* Gallery */}
+      {/* Gallery - Responsive adjustments passed via props */}
       <div className="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px]">
         <CircularGallery
           items={portfolioItems}
-          bend={3}
-          textColor="#ffffff"
+          bend={isMobile ? 1 : 3}
           borderRadius={0.05}
-          scrollEase={0.02}
-          scrollSpeed={2}
-          font="bold 30px system-ui, -apple-system, sans-serif"
+          scrollEase={isMobile ? 0.1 : 0.02} // Snappier on mobile
+          scrollSpeed={isMobile ? 3 : 2} // Faster scroll on mobile
         />
       </div>
     </section>
