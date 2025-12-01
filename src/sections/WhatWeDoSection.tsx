@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, hoverCard } from "@/lib/motion";
 import { getCalApi } from "@calcom/embed-react";
 import { useEffect } from "react";
+import FuzzyText from "@/components/FuzzyText";
 
 export default function WhatWeDoSection() {
   useEffect(() => {
@@ -37,17 +38,24 @@ export default function WhatWeDoSection() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }} // only animate first time in view, ~20% visible
         >
-          <motion.p
-            variants={fadeUp}
-            className="text-sm font-medium text-white/60 tracking-wide uppercase"
-          >
-            What We Do
-          </motion.p>
+          <div className="mb-4 -ml-[56px]">
+            <FuzzyText
+              baseIntensity={0}
+              hoverIntensity={0.05}
+              enableHover={true}
+              fontSize="clamp(2rem, 4vw, 3.5rem)"
+              fontWeight={900}
+              color="#fff"
+              className="!mx-0"
+            >
+              What We Do
+            </FuzzyText>
+          </div>
 
           <motion.h2
             variants={fadeUp}
             className="
-              text-3xl sm:text-4xl md:text-5xl font-bold
+              text-2xl sm:text-3xl md:text-4xl font-bold
               leading-[1.15] text-white
             "
           >
@@ -68,13 +76,9 @@ export default function WhatWeDoSection() {
           </motion.p>
         </motion.div>
 
-        {/* 2. Key Questions grid */}
-        <motion.div
-          className="
-            grid gap-6
-            sm:grid-cols-2
-            lg:grid-cols-3
-          "
+        {/* 2. Key Questions List */}
+        <motion.ul
+          className="flex flex-col gap-8"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -94,82 +98,37 @@ export default function WhatWeDoSection() {
               desc: "Get architecture guidance tailored to your growth stage, team capabilities, and technical constraints.",
             },
           ].map((item, i) => (
-            <motion.div
+            <motion.li
               key={i}
               variants={fadeUp}
-              {...hoverCard}
-              className="
-                group relative rounded-2xl border border-white/10
-                bg-white/[0.03] backdrop-blur-md
-                p-6 flex flex-col gap-3
-                shadow-[0_20px_60px_rgba(0,0,0,0.8)]
-                transition-colors
-                hover:border-white/20
-              "
+              className="group flex flex-col gap-2"
             >
-              {/* Subtle animated border glow accent on hover
-                 (React Bits vibe: interactive, animated, memorable). :contentReference[oaicite:9]{index=9}
-               */}
-              <div
-                className="
-                  pointer-events-none absolute inset-0 rounded-2xl
-                  opacity-0 group-hover:opacity-100
-                  transition-opacity duration-300
-                  bg-[radial-gradient(circle_at_0%_0%,rgba(255,255,255,0.18)_0%,rgba(0,0,0,0)_70%)]
-                "
-                aria-hidden="true"
-              />
-              <h3 className="text-base sm:text-lg font-semibold text-white">
-                {item.title}
-              </h3>
-              <p className="text-sm sm:text-base text-white/70 leading-relaxed">
+              <div className="flex items-center gap-4 w-full">
+                <span className="text-xl sm:text-2xl font-semibold text-white whitespace-nowrap">
+                  {item.title}
+                </span>
+                
+                <div className="grow min-w-[20px] border-b border-dashed border-neutral-800 group-hover:border-neutral-600 transition-colors duration-200 h-[1px] translate-y-[1px]" />
+                
+                <svg
+                  className="w-5 h-5 text-neutral-500 group-hover:text-white transition-colors transform group-hover:translate-x-1 duration-300"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+              
+              <p className="text-white/70 leading-relaxed max-w-2xl pl-0 sm:pl-0">
                 {item.desc}
               </p>
-            </motion.div>
+            </motion.li>
           ))}
-        </motion.div>
-
-        {/* 3. Process timeline */}
-        {/* <motion.div
-          className="flex flex-col gap-8"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          {[
-            {
-              step: "1. Understand Your Challenge",
-              text: "We start by deeply understanding your technical question, business constraints, and what success looks like for your team and timeline.",
-            },
-            {
-              step: "2. Rapid Prototyping (2-3 weeks)",
-              text: "We build working prototypes that test your core assumptions, validate feasibility, and demonstrate real value before you commit significant resources. No slide decks—just working code.",
-            },
-            {
-              step: "3. Deliver Working Solutions",
-              text: "You receive: a production-ready prototype, comprehensive technical documentation, detailed cost-benefit analysis, and a concrete implementation roadmap. Make confident decisions backed by evidence, not guesswork.",
-            },
-          ].map((row, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                className="
-                  flex flex-col
-                  bg-white/[0.02] border border-white/10 rounded-xl
-                  p-4 sm:p-6
-                  shadow-[0_20px_60px_rgba(0,0,0,0.8)]
-                "
-              >
-                <div className="text-white font-semibold text-base sm:text-lg">
-                  {row.step}
-                </div>
-                <div className="text-white/70 text-sm sm:text-base leading-relaxed">
-                  {row.text}
-                </div>
-              </motion.div>
-            ))}
-        </motion.div> */}
+        </motion.ul>
 
         {/* 4. CTA */}
         <motion.div
@@ -221,6 +180,7 @@ export default function WhatWeDoSection() {
               hover:bg-white/10 hover:border-white/40
               focus:outline-none focus:ring-2 focus:ring-white/40
               transition-all duration-300 touch-manipulation
+              whitespace-nowrap shrink-0
             "
             data-cal-namespace="intro"
             data-cal-link="mogil-ventures/intro"

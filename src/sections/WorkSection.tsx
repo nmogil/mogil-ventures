@@ -3,6 +3,7 @@ import { portfolioItems } from '@/data/portfolioItems';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '@/lib/motion';
 import { useEffect, useState } from 'react';
+import FuzzyText from '@/components/FuzzyText';
 
 export default function WorkSection() {
   const [isMobile, setIsMobile] = useState(() => {
@@ -32,19 +33,18 @@ export default function WorkSection() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
       >
-        <motion.p
-          className="text-sm font-medium text-white/60 tracking-wide uppercase"
-          variants={fadeUp}
-        >
-          PROJECTS
-        </motion.p>
-
-        <motion.h2
-          className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] text-white mt-2"
-          variants={fadeUp}
-        >
-          PROJECTS
-        </motion.h2>
+        <div className="flex justify-center mb-4">
+          <FuzzyText
+            baseIntensity={0}
+            hoverIntensity={0.05}
+            enableHover={true}
+            fontSize="clamp(2rem, 4vw, 3.5rem)"
+            fontWeight={900}
+            color="#fff"
+          >
+            PROJECTS
+          </FuzzyText>
+        </div>
 
         <motion.p
           className="mt-4 text-base sm:text-lg text-white/70 leading-relaxed max-w-2xl mx-auto"

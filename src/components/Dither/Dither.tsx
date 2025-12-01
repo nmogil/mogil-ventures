@@ -332,7 +332,7 @@ export default function Dither({
         preserveDrawingBuffer: true,
         powerPreference: isMobile ? 'low-power' : 'high-performance'
       }}
-      frameloop={isMobile ? 'demand' : 'always'} // Reduce frame updates on mobile
+      frameloop="always"
     >
       <DitheredWaves
         waveSpeed={waveSpeed}
