@@ -20,9 +20,14 @@ export default function HeroSection() {
 
       // Calculate explicit font size for Safari mobile
       if (window.innerWidth < 768) {
-        const vwSize = window.innerWidth * 0.25; // 25vw
-        const minSize = 72; // 4.5rem
-        const maxSize = 128; // 8rem
+        // "MOGIL VENTURES" is approx 14 chars.
+        // To fit within screen width with padding:
+        // Width ≈ fontSize * 0.7 * 14 chars
+        // Target Width ≈ 85vw (to leave buffer)
+        // fontSize ≈ 85vw / (0.7 * 14) ≈ 8.6vw
+        const vwSize = window.innerWidth * 0.085; // 8.5vw
+        const minSize = 24; // 1.5rem - Reduced minimum further for small screens
+        const maxSize = 60; // 3.75rem
         const calculatedSize = Math.max(minSize, Math.min(vwSize, maxSize));
         setMobileFontSize(`${calculatedSize}px`);
       }
@@ -47,17 +52,19 @@ export default function HeroSection() {
           waveFrequency={3}
           waveSpeed={0.05}
         />
+        {/* Gradient overlay to ensure scroll text visibility */}
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex items-center justify-center w-full h-full px-6 sm:px-8 md:px-12 pointer-events-none">
-        <div className="w-full md:w-auto flex justify-center items-center overflow-hidden md:overflow-visible pointer-events-auto">
+      <div className="relative z-10 flex items-center justify-center w-full h-full px-4 sm:px-8 md:px-12 pointer-events-none">
+        <div className="w-full md:w-auto flex justify-center items-center overflow-hidden md:overflow-visible pointer-events-auto max-w-[95vw] md:max-w-none mx-auto">
           <div style={isMobile ? { filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.3)) drop-shadow(0 0 30px rgba(255,255,255,0.2)) drop-shadow(0 0 10px rgba(0,0,0,0.8))' } : { filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.2))' }}>
             <FuzzyText
-              baseIntensity={0.3}
-              hoverIntensity={0.6}
+              baseIntensity={0.2}
+              hoverIntensity={0.5}
               enableHover={true}
-              fontSize={isMobile && mobileFontSize ? mobileFontSize : (isMobile ? "clamp(4.5rem, 25vw, 8rem)" : "clamp(3.5rem, 13vw, 9rem)")}
+              fontSize={isMobile && mobileFontSize ? mobileFontSize : (isMobile ? "clamp(1.5rem, 8.5vw, 3.75rem)" : "clamp(3.5rem, 13vw, 9rem)")}
               fontWeight={900}
               color="#fff"
             >
@@ -68,7 +75,7 @@ export default function HeroSection() {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-white text-xs sm:text-sm font-medium">
+      <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-white text-xs sm:text-sm font-bold tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
         <div className="animate-smooth-float flex flex-col items-center gap-1 sm:gap-2">
           <span className="hidden sm:inline">Scroll to explore</span>
           <span className="sm:hidden">Scroll</span>
