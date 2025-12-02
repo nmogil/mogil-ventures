@@ -3,11 +3,13 @@ import Home from './pages/Home';
 import BlogPost from './pages/BlogPost';
 import ThoughtsPage from './pages/ThoughtsPage';
 import ScrollToTop from './components/ScrollToTop';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <Router>
       <ScrollToTop />
+      <Navbar />
       <div className="app min-h-screen bg-background text-foreground">
         <Routes>
           <Route path="/" element={<Home />} />

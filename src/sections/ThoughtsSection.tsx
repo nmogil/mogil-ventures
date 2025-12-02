@@ -13,7 +13,7 @@ export default function ThoughtsSection() {
   const displayedThoughts = sortedThoughts.slice(0, 5);
 
   return (
-    <section className="py-24 max-w-3xl mx-auto px-6">
+    <section id="thoughts" className="py-24 max-w-3xl mx-auto px-6">
       <div className="flex items-end justify-between mb-12">
         <div className="-ml-[50px]">
           <FuzzyText

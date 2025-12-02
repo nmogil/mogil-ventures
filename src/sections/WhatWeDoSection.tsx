@@ -13,6 +13,7 @@ export default function WhatWeDoSection() {
   }, []);
   return (
     <section
+      id="what-we-do"
       className="
         relative w-full bg-black text-white
         px-4 py-16 sm:py-20 md:py-24

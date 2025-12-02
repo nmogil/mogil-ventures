@@ -4,6 +4,8 @@ export interface Thought {
   description: string;
   date: string;
   slug: string;
+  author?: string;
+  authorTitle?: string;
 }
 
 export const thoughts: Thought[] = [
@@ -13,6 +15,8 @@ export const thoughts: Thought[] = [
     description: 'How enterprises, startups, and builders actually move from impressive demos to production-ready AI agents',
     date: '2025-12-02',
     slug: 'conversational-ai-agent-landscape',
+    author: 'Noah Mogil',
+    authorTitle: 'Founding Builder',
   },
   {
     id: '1',

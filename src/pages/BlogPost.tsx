@@ -54,8 +54,17 @@ export default function BlogPost() {
           <h1 className="text-3xl md:text-4xl font-medium mb-4 tracking-tight">{thought.title}</h1>
           <p className="text-neutral-500 text-lg mb-4">{thought.description}</p>
 
-          <div className="flex items-center gap-3 text-sm text-neutral-600 font-mono">
-            <time dateTime={thought.date}>
+          <div className="flex items-center gap-3 text-sm text-neutral-500">
+            {thought.author && (
+              <>
+                <span className="font-medium text-neutral-300">{thought.author}</span>
+                {thought.authorTitle && (
+                  <span className="text-neutral-600">{thought.authorTitle}</span>
+                )}
+                <span className="text-neutral-700">·</span>
+              </>
+            )}
+            <time dateTime={thought.date} className="font-mono text-neutral-600">
               {new Date(thought.date).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',

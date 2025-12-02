@@ -24,7 +24,7 @@ export default function WorkSection() {
   }, []);
 
   return (
-    <section className="relative bg-black py-8 sm:py-12 md:py-16 px-4">
+    <section id="projects" className="relative bg-black py-8 sm:py-12 md:py-16 px-4">
       {/* Header */}
       <motion.div
         className="max-w-3xl mx-auto text-center mb-8 sm:mb-12 md:mb-16"
