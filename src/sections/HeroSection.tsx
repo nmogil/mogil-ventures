@@ -15,7 +15,6 @@ const FuzzyTextPlaceholder = () => (
     style={{
       fontSize: 'clamp(3.5rem, 13vw, 9rem)',
       fontWeight: 900,
-      opacity: 0.8
     }}
   >
     MOGIL VENTURES

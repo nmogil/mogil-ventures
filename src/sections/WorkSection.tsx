@@ -9,7 +9,7 @@ const FuzzyText = lazy(() => import('@/components/FuzzyText'));
 
 // Lightweight placeholders
 const GalleryPlaceholder = () => (
-  <div className="w-full h-full bg-neutral-900/50 animate-pulse rounded-lg flex items-center justify-center">
+  <div className="w-full h-full bg-neutral-900/50 rounded-lg flex items-center justify-center">
     <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
   </div>
 );
@@ -32,7 +32,7 @@ export default function WorkSection() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -78,8 +78,8 @@ export default function WorkSection() {
             items={portfolioItems}
             bend={isMobile ? 1 : 3}
             borderRadius={0.05}
-            scrollEase={isMobile ? 0.1 : 0.02} // Snappier on mobile
-            scrollSpeed={isMobile ? 3 : 2} // Faster scroll on mobile
+            scrollEase={isMobile ? 0.1 : 0.02}
+            scrollSpeed={isMobile ? 3 : 2}
           />
         </Suspense>
       </div>
