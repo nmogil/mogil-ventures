@@ -1,23 +1,33 @@
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Mail } from 'lucide-react';
-import Dither from '../components/Dither/Dither';
+import { lazy, Suspense } from 'react';
 import { fadeUp } from '../lib/motion';
+
+// Lazy load heavy 3D component
+const Dither = lazy(() => import('../components/Dither/Dither'));
+
+// Lightweight placeholder
+const DitherPlaceholder = () => (
+  <div className="w-full h-full bg-gradient-to-br from-neutral-900 to-black" />
+);
 
 const Footer = () => {
   return (
     <footer className="relative min-h-[280px] flex items-center justify-center overflow-hidden">
       {/* Subtle Dither Background */}
       <div className="absolute inset-0 z-0 opacity-60">
-        <Dither
-          waveColor={[0.3, 0.3, 0.3]}
-          disableAnimation={false}
-          enableMouseInteraction={false}
-          mouseRadius={0}
-          colorNum={3}
-          waveAmplitude={0.15}
-          waveFrequency={3}
-          waveSpeed={0.02}
-        />
+        <Suspense fallback={<DitherPlaceholder />}>
+          <Dither
+            waveColor={[0.3, 0.3, 0.3]}
+            disableAnimation={false}
+            enableMouseInteraction={false}
+            mouseRadius={0}
+            colorNum={3}
+            waveAmplitude={0.15}
+            waveFrequency={3}
+            waveSpeed={0.02}
+          />
+        </Suspense>
       </div>
 
       {/* Content */}

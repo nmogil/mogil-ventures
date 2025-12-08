@@ -4,8 +4,8 @@ export const profileData = {
   handle: 'mogil_mogil_mogil',
   status: 'Lets Build',
   contactText: 'Let\'s Connect',
-  avatarUrl: '/images/headshot_no_bg.png',
-  miniAvatarUrl: '/images/headshot_no_bg.png',
+  avatarUrl: '/images/headshot_no_bg.webp',
+  miniAvatarUrl: '/images/headshot_no_bg.webp',
   contactEmail: 'contact@mogilventures.com', // Update with real email
   // Alternative: contactCalendar: 'https://calendly.com/mogilventures'
 };
