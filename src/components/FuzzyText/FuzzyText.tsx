@@ -25,9 +25,19 @@ const FuzzyText: React.FC<FuzzyTextProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement & { cleanupFuzzyText?: () => void }>(null);
 
+  // Detect mobile for performance optimization
+  const isMobile = typeof window !== 'undefined' && (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    window.innerWidth < 768
+  );
+
   useEffect(() => {
     let animationFrameId: number;
     let isCancelled = false;
+    let lastFrameTime = 0;
+    // Mobile: 15fps (67ms), Desktop: 60fps (no throttle)
+    const frameInterval = isMobile ? 67 : 0;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -98,20 +108,33 @@ const FuzzyText: React.FC<FuzzyTextProps> = ({
       const interactiveBottom = interactiveTop + tightHeight;
 
       let isHovering = false;
-      const fuzzRange = 30;
+      // Reduce fuzz range on mobile for better performance
+      const fuzzRange = isMobile ? 15 : 30;
+      // On mobile, skip every other line for faster rendering
+      const lineStep = isMobile ? 2 : 1;
 
-      const run = () => {
+      const run = (timestamp: number) => {
         if (isCancelled) return;
+
+        // Throttle frame rate on mobile
+        if (frameInterval > 0) {
+          if (timestamp - lastFrameTime < frameInterval) {
+            animationFrameId = window.requestAnimationFrame(run);
+            return;
+          }
+          lastFrameTime = timestamp;
+        }
+
         ctx.clearRect(-fuzzRange, -fuzzRange, offscreenWidth + 2 * fuzzRange, tightHeight + 2 * fuzzRange);
-        const intensity = isHovering ? hoverIntensity : baseIntensity;
-        for (let j = 0; j < tightHeight; j++) {
+        const intensity = isHovering ? hoverIntensity : (isMobile ? baseIntensity * 0.5 : baseIntensity);
+        for (let j = 0; j < tightHeight; j += lineStep) {
           const dx = Math.floor(intensity * (Math.random() - 0.5) * fuzzRange);
-          ctx.drawImage(offscreen, 0, j, offscreenWidth, 1, dx, j, offscreenWidth, 1);
+          ctx.drawImage(offscreen, 0, j, offscreenWidth, lineStep, dx, j, offscreenWidth, lineStep);
         }
         animationFrameId = window.requestAnimationFrame(run);
       };
 
-      run();
+      run(0);
 
       const isInsideTextArea = (x: number, y: number) =>
         x >= interactiveLeft && x <= interactiveRight && y >= interactiveTop && y <= interactiveBottom;
@@ -173,7 +196,7 @@ const FuzzyText: React.FC<FuzzyTextProps> = ({
         canvas.cleanupFuzzyText();
       }
     };
-  }, [children, fontSize, fontWeight, fontFamily, color, enableHover, baseIntensity, hoverIntensity]);
+  }, [children, fontSize, fontWeight, fontFamily, color, enableHover, baseIntensity, hoverIntensity, isMobile]);
 
   return <canvas ref={canvasRef} className={`fuzzy-text-canvas ${className}`} />;
 };

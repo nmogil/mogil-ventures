@@ -192,6 +192,10 @@ interface DitheredWavesProps {
   mouseRadius: number;
 }
 
+interface DitheredWavesPropsInternal extends DitheredWavesProps {
+  isMobile: boolean;
+}
+
 function DitheredWaves({
   waveSpeed,
   waveFrequency,
@@ -201,11 +205,16 @@ function DitheredWaves({
   pixelSize,
   disableAnimation,
   enableMouseInteraction,
-  mouseRadius
-}: DitheredWavesProps) {
+  mouseRadius,
+  isMobile
+}: DitheredWavesPropsInternal) {
   const mesh = useRef<THREE.Mesh>(null);
   const mouseRef = useRef(new THREE.Vector2());
+  const lastUpdateRef = useRef(0);
   const { viewport, size, gl } = useThree();
+
+  // Mobile: update at 15fps (67ms), Desktop: 60fps (no throttle)
+  const frameInterval = isMobile ? 67 : 0;
 
   const waveUniformsRef = useRef<WaveUniforms>({
     time: new THREE.Uniform(0),
@@ -231,6 +240,15 @@ function DitheredWaves({
 
   const prevColor = useRef([...waveColor]);
   useFrame(({ clock }) => {
+    // Throttle updates on mobile for better performance
+    if (frameInterval > 0) {
+      const now = clock.getElapsedTime() * 1000;
+      if (now - lastUpdateRef.current < frameInterval) {
+        return; // Skip this frame
+      }
+      lastUpdateRef.current = now;
+    }
+
     const u = waveUniformsRef.current;
 
     if (!disableAnimation) {
@@ -335,15 +353,16 @@ export default function Dither({
       frameloop="always"
     >
       <DitheredWaves
-        waveSpeed={waveSpeed}
+        waveSpeed={isMobile ? waveSpeed * 0.5 : waveSpeed}
         waveFrequency={waveFrequency}
         waveAmplitude={waveAmplitude}
         waveColor={waveColor}
         colorNum={isMobile ? mobileColorNum : colorNum}
         pixelSize={isMobile ? mobilePixelSize : pixelSize}
         disableAnimation={disableAnimation}
-        enableMouseInteraction={!isMobile && enableMouseInteraction} // Disable mouse interaction on mobile
+        enableMouseInteraction={!isMobile && enableMouseInteraction}
         mouseRadius={mouseRadius}
+        isMobile={isMobile}
       />
     </Canvas>
   );
