@@ -299,6 +299,9 @@ class App {
   lastTouchX: number = 0;
   lastTouchTime: number = 0;
 
+  // Visibility tracking for performance
+  isVisible: boolean = true;
+
   constructor(
     container: HTMLElement,
     {
@@ -560,7 +563,19 @@ class App {
     }
   }
 
+  setVisible(visible: boolean) {
+    this.isVisible = visible;
+  }
+
   update() {
+    // Skip rendering when off-screen, but keep checking periodically
+    if (!this.isVisible) {
+      this.raf = window.setTimeout(() => {
+        this.raf = window.requestAnimationFrame(this.update.bind(this));
+      }, 500) as unknown as number;
+      return;
+    }
+
     // Apply momentum decay (friction) when not touching
     if (!this.isDown && Math.abs(this.velocity) > 0.001) {
       const friction = 0.88; // Friction coefficient (lower = more friction, increased for slower momentum)
@@ -598,6 +613,7 @@ class App {
 
   destroy() {
     window.cancelAnimationFrame(this.raf);
+    window.clearTimeout(this.raf);
     window.removeEventListener('resize', this.boundOnResize);
     window.removeEventListener('mousewheel', this.boundOnWheel);
     window.removeEventListener('wheel', this.boundOnWheel);
@@ -629,6 +645,8 @@ export default function CircularGallery({
   scrollEase = 0.05
 }: CircularGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const appRef = useRef<App | null>(null);
+
   useEffect(() => {
     if (!containerRef.current) return;
     // Skip initialization if container has no dimensions (e.g. hidden)
@@ -641,9 +659,30 @@ export default function CircularGallery({
       scrollSpeed,
       scrollEase
     });
+    appRef.current = app;
     return () => {
       app.destroy();
+      appRef.current = null;
     };
   }, [items, bend, borderRadius, scrollSpeed, scrollEase]);
+
+  // Set up IntersectionObserver to pause animation when off-screen
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (appRef.current) {
+          appRef.current.setVisible(entry.isIntersecting);
+        }
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   return <div className="circular-gallery" ref={containerRef} />;
 }

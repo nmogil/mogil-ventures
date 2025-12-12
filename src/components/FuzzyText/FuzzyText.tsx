@@ -24,12 +24,29 @@ const FuzzyText: React.FC<FuzzyTextProps> = ({
   className = ''
 }) => {
   const canvasRef = useRef<HTMLCanvasElement & { cleanupFuzzyText?: () => void }>(null);
+  const isVisibleRef = useRef(true);
 
   // Detect mobile for performance optimization
   const isMobile = typeof window !== 'undefined' && (
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
     window.innerWidth < 768
   );
+
+  // Set up IntersectionObserver to pause animation when off-screen
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     let animationFrameId: number;
@@ -116,6 +133,14 @@ const FuzzyText: React.FC<FuzzyTextProps> = ({
       const run = (timestamp: number) => {
         if (isCancelled) return;
 
+        // Skip animation when off-screen, but keep checking periodically
+        if (!isVisibleRef.current) {
+          animationFrameId = window.setTimeout(() => {
+            animationFrameId = window.requestAnimationFrame(run);
+          }, 500) as unknown as number;
+          return;
+        }
+
         // Throttle frame rate on mobile
         if (frameInterval > 0) {
           if (timestamp - lastFrameTime < frameInterval) {
@@ -176,6 +201,7 @@ const FuzzyText: React.FC<FuzzyTextProps> = ({
 
       const cleanup = () => {
         window.cancelAnimationFrame(animationFrameId);
+        window.clearTimeout(animationFrameId);
         if (enableHover) {
           canvas.removeEventListener('mousemove', handleMouseMove);
           canvas.removeEventListener('mouseleave', handleMouseLeave);

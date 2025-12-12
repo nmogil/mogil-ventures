@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import { useRef, useEffect, forwardRef } from 'react';
+import { useRef, useEffect, forwardRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import type { ThreeEvent } from '@react-three/fiber';
 import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
@@ -330,6 +330,9 @@ export default function Dither({
   enableMouseInteraction = true,
   mouseRadius = 1
 }: DitherProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
   // Detect mobile and adjust performance settings
   const isMobile = typeof window !== 'undefined' && (
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
@@ -340,30 +343,48 @@ export default function Dither({
   const mobilePixelSize = Math.max(pixelSize * 1.5, 3); // Larger pixels = less processing
   const mobileColorNum = Math.max(colorNum - 1, 2); // Fewer colors = less processing
 
+  // Pause animation when off-screen for performance
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <Canvas
-      className="dither-container"
-      camera={{ position: [0, 0, 6] }}
-      dpr={1}
-      gl={{
-        antialias: !isMobile, // Disable antialiasing on mobile
-        preserveDrawingBuffer: true,
-        powerPreference: isMobile ? 'low-power' : 'high-performance'
-      }}
-      frameloop="always"
-    >
-      <DitheredWaves
-        waveSpeed={isMobile ? waveSpeed * 0.5 : waveSpeed}
-        waveFrequency={waveFrequency}
-        waveAmplitude={waveAmplitude}
-        waveColor={waveColor}
-        colorNum={isMobile ? mobileColorNum : colorNum}
-        pixelSize={isMobile ? mobilePixelSize : pixelSize}
-        disableAnimation={disableAnimation}
-        enableMouseInteraction={!isMobile && enableMouseInteraction}
-        mouseRadius={mouseRadius}
-        isMobile={isMobile}
-      />
-    </Canvas>
+    <div ref={containerRef} className="dither-wrapper">
+      <Canvas
+        className="dither-container"
+        camera={{ position: [0, 0, 6] }}
+        dpr={1}
+        gl={{
+          antialias: !isMobile, // Disable antialiasing on mobile
+          preserveDrawingBuffer: true,
+          powerPreference: isMobile ? 'low-power' : 'high-performance'
+        }}
+        frameloop={isVisible ? 'always' : 'never'}
+      >
+        <DitheredWaves
+          waveSpeed={isMobile ? waveSpeed * 0.5 : waveSpeed}
+          waveFrequency={waveFrequency}
+          waveAmplitude={waveAmplitude}
+          waveColor={waveColor}
+          colorNum={isMobile ? mobileColorNum : colorNum}
+          pixelSize={isMobile ? mobilePixelSize : pixelSize}
+          disableAnimation={disableAnimation}
+          enableMouseInteraction={!isMobile && enableMouseInteraction}
+          mouseRadius={mouseRadius}
+          isMobile={isMobile}
+        />
+      </Canvas>
+    </div>
   );
 }
